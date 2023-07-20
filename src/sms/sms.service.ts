@@ -6,6 +6,7 @@ import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 @Injectable()
 export class SmsService {
   private twilioClient: Twilio;
+  private
   constructor(
     private configService: ConfigService
   ){
@@ -17,13 +18,17 @@ export class SmsService {
 
   async initiatePhoneNumberVerification(phoneNumber: string): Promise<any>{
     try{
-    const serviceSid = this.configService.get<string>('twilio.service_sid');
-    console.log('service SID: ' + serviceSid)
-    return this.twilioClient.verify.v2.services(serviceSid)
-      .verifications
-      .create({ to: phoneNumber, channel: 'sms'})
-      .then(verification => console.log('verification: '+verification.channel))
-    // return true;
+      const serviceSid = this.configService.get<string>('twilio.service_sid');
+
+      console.log('service SID: ' + serviceSid)
+      const result = await this.twilioClient.verify.v2.services(serviceSid)
+          .verifications
+          .create({ to: phoneNumber, channel: 'sms'})
+          .then(verification => {
+            console.log('status: ',verification.status)
+          })
+
+      return true;
     }catch (error){
       return new  HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -43,6 +48,7 @@ export class SmsService {
     }  
     return 'Login success';
   }catch(error){
+    console.log(error);
     return new HttpException(error, HttpStatus.BAD_REQUEST);
   }
   }

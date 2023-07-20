@@ -14,16 +14,16 @@ function otpLoginForm() {
     data.json()})
       .then(res => {       
         console.log('test: ',res.data); 
-        //   if (res.status === 500) {
-        //        alert("An error occurred, try again")
-        //   } else {
-        //       alert("We sent a verification code to "+phoneNumber);
-        //       form.reset();
-        //       window.location.href = "/sms/verify"
-        //     }
-        //       alert("We sent a verification code to "+phoneNumber);
-        //       form.reset();
+          if (res.status === 500) {
+               alert("An error occurred, try again")
+          } else {
+              alert("We sent a verification code to "+phoneNumber);
+              form.reset();
               window.location.href = "/sms/verify"
+            }
+        //       alert("We sent a verification code to "+phoneNumber);
+        //       form.reset();
+            //   window.location.href = "/sms/verify"
       })
 
 }

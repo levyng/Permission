@@ -15,7 +15,7 @@ export class SmsController {
 
   @UseGuards(JwtStrategy)
   @Post('')
-  async initiatePhoneNumberVerification(@Body() sms: SmsLoginDto, @Res() res){
+  async initiatePhoneNumberVerification(@Body() sms: SmsLoginDto){
     return await this.smsService.initiatePhoneNumberVerification(sms.phoneNumber);
     // return HttpStatus.CREATED;
   }

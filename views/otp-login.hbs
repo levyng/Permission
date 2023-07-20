@@ -43,7 +43,6 @@
 
 
     <!-- Main JS-->
-    <script src="/js/global.js"></script>
     <script>
         function otpLoginForm() {
             const form = document.getElementById('form');
@@ -52,21 +51,21 @@
             fetch('http://localhost:3000/sms', {
                 method: "POST",
                 body: JSON.stringify({
-                    phoneNumber:phoneNumber
+                    phoneNumber
                 }),
                 headers: {
                     "Content-type": "application/json"
                 }
             }).then(data => data.json())
                 .then(res => {
-                    console.log('test: ',res);
+                    console.log('test');
                     if (res.status === 500) {
                         alert("An error occurred, try again")
                     } else {
-                        alert("We sent a verification code to "+phoneNumber);
+                        alert("We sent a verification code to ",phoneNumber);
                         form.reset();
                         window.location.href = "/sms/verify"
-                        }                
+                    }                
                 })
 
         }
