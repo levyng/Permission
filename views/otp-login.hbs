@@ -17,24 +17,24 @@
 <body>
    <div class="page-wrapper bg-dark p-t-100 p-b-50">
        <div class="wrapper wrapper--w900">
+            <form method="POST" id="form" action="/sms">
            <div class="card card-6">
                <div class="card-heading">
                    <h2 class="title">Login</h2>
                </div>
                <div class="card-body">
-                   <form method="POST" id="form">
                        <div class="form-row">
                            <div class="name">Phone Number</div>
                            <div class="value">
                                <input class="input--style-6" type="text" name="phoneNumber" id="phoneNumber">
                            </div>
                        </div>
-                   </form>
                </div>
                <div class="card-footer">
-                   <button class="btn btn--radius-2 btn--blue-2" type="submit" onclick="otpLoginForm()">Login</button>
+                   <button class="btn btn--radius-2 btn--blue-2" type="submit">Login</button>
                </div>
            </div>
+
        </div>
    </div>
 
@@ -43,33 +43,7 @@
 
 
     <!-- Main JS-->
-    <script>
-        function otpLoginForm() {
-            const form = document.getElementById('form');
-            const phoneNumber = document.getElementById('phoneNumber').value;
-
-            fetch('http://localhost:3000/sms', {
-                method: "POST",
-                body: JSON.stringify({
-                    phoneNumber
-                }),
-                headers: {
-                    "Content-type": "application/json"
-                }
-            }).then(data => data.json())
-                .then(res => {
-                    console.log('test');
-                    if (res.status === 500) {
-                        alert("An error occurred, try again")
-                    } else {
-                        alert("We sent a verification code to ",phoneNumber);
-                        form.reset();
-                        window.location.href = "/sms/verify"
-                    }                
-                })
-
-        }
-    </script>
+    {{!-- <script src="/public/js/index.js"></script> --}}
     {{!-- <script src="/js/index.js" async></script> --}}
 </body>
 </html>

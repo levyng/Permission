@@ -25,8 +25,12 @@
                    <h2 class="title">Login</h2>
                </div>
                <div class="card-footer">
-                   <a href="http://localhost:3000/sms" class="btn btn--radius-2 btn--blue-2" type="submit" id="otp" onclick="otpLogin()">Login with OTP</a>
-                   <a href="http://localhost:3000/auth/google" class="btn btn--radius-2 btn--blue-2" type="submit" id="gmail" onclick="gmailLogin()">Login With Gmail</a>
+                <form method="GET" action="/sms">
+                   <button class="btn btn--radius-2 btn--blue-2" type="submit" >Login with OTP</button>
+                </form>
+                <form method="GET" action="/auth/google">
+                    <button class="btn btn--radius-2 btn--blue-2" type="submit" id="gmail" action="/auth/google">Login With Gmail</button>
+                </form>
                </div>
            </div>
        </div>

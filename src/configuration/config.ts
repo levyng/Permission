@@ -18,5 +18,8 @@ export default () => ({
     auth_token: process.env.AUTH_TOKEN,
     service_sid: process.env.SERVICE_SID
   },
+  message_bird: {
+    key: process.env.MESSAGE_BIRD_KEY
+  },
   port: process.env.PORT || 3000
 })

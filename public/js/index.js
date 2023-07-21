@@ -1,34 +1,30 @@
-function otpLoginForm() {
-  const form = document.getElementById('form');
-  const phoneNumber = document.getElementById('phoneNumber').value;
+export function otpLoginForm() {
+    const form = document.getElementById('form');
+    const phoneNumber = document.getElementById('phoneNumber').value;
 
-  fetch('http://localhost:3000/sms', {
-      method: "POST",
-      body: JSON.stringify({
-          phoneNumber:phoneNumber
-      }),
-      headers: {
-          "Content-type": "application/json"
-      }
-  }).then(data => {
-    data.json()})
-      .then(res => {       
-        console.log('test: ',res.data); 
-          if (res.status === 500) {
-               alert("An error occurred, try again")
-          } else {
-              alert("We sent a verification code to "+phoneNumber);
-              form.reset();
-              window.location.href = "/sms/verify"
-            }
-        //       alert("We sent a verification code to "+phoneNumber);
-        //       form.reset();
-            //   window.location.href = "/sms/verify"
-      })
+    fetch('http://localhost:3000/sms', {
+        method: "POST",
+        body: JSON.stringify({
+            phoneNumber
+        }),
+        headers: {
+            "Content-type": "application/json"
+        }
+    }).then(data => data.json())
+        .then(res => {
+            console.log('test===');
+            if (res.status === 500) {
+                alert("An error occurred, try again")
+            } else {
+                alert("We sent a verification code to ",phoneNumber);
+                form.reset();
+                window.location.href = "/sms/verify"
+            }                
+        })
 
 }
 
-function codeConfirmForm() {
+export function codeConfirmForm() {
   const form = document.getElementById('form');
   const code = document.getElementById('code').value;
   console.log("code")
