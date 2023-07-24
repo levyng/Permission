@@ -9,62 +9,108 @@ import initMB, {
   Message,
   MessageBird,
 } from 'messagebird';
+import {
+  Vonage
+} from "@vonage/server-sdk";
+
+import {VerifyWorkflows} from '@vonage/verify/dist/enums/index';
 @Injectable()
 export class SmsService {
   private twilioClient: Twilio;
   private phone: string;
-  private messageBirdClient:  MessageBird;
+  // private messageBirdClient:  MessageBird;
+  private vonageClient: Vonage;
+  private vonageRequestId: string;
 
   constructor(
     private configService: ConfigService
   ){
+    /*Verify with Twilio*/
     const accountSid = configService.get('twilio.account_sid');
     const authToken = configService.get<string>('twilio.auth_token');
-
     this.twilioClient = new Twilio(accountSid, authToken);
 
-    const messageBirdKey = configService.get('message_bird.key');
-    this.messageBirdClient = initClient(messageBirdKey)
+    // const messageBirdKey = configService.get('message_bird.key');
+    // this.messageBirdClient = initClient(messageBirdKey)
+
+    /*Verify with Vogane*/
+    const apiKey = configService.get<string>('vonage.api_key');
+    const apiSecret = configService.get<string>('vonage.api_secret');
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    this.vonageClient = new Vonage({apiKey:apiKey,apiSecret: apiSecret});
+
   }
 
-  async initVerifyMB(phoneNumber): Promise<any>{
-    try{
-      this.formatPhoneNumber(phoneNumber);
-      return await this.messageBirdClient.verify.create(
-        this.phone,
-        {
-          type:"sms",
-          tokenLength: 6
-        }, function (err, response) {
-        if (err)
-          console.log("error: ",err);
-        else console.log('res===',response);
-    });
+  async initVerifyVonage(phoneNumber: string): Promise<any>{
+    this.vonageClient.verify.start({
+      number: phoneNumber,
+      brand: "Vonage",
+      workflowId: VerifyWorkflows.SMS 
+    })
+      .then(resp => {
+        this.vonageRequestId=resp.request_id;
+
+        console.log('reqId:',resp.requestId,', status:',resp.status);
+        if(resp.status==="0")
+          return new HttpException("Success",HttpStatus.OK);
+          else return new HttpException("Failed",HttpStatus.INTERNAL_SERVER_ERROR);
+      })
+      .catch(err => {
+        return new  HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+      })
+  }
+
+  async verifyCodeVonage(code: string): Promise<any>{
+      this.vonageClient.verify.check(this.vonageRequestId, code)
+      .then(resp => {        
+        console.log('reqId===',resp.requestId,', status===',resp.status);
+        return resp.status;
+      })
+      .catch(err =>{
+        return new HttpException(err, HttpStatus.BAD_REQUEST);
+      });
+  }
+
+  // async initVerifyMB(phoneNumber): Promise<any>{
+  //   try{
+  //     this.formatPhoneNumber(phoneNumber);
+  //     return await this.messageBirdClient.verify.create(
+  //       this.phone,
+  //       {
+  //         type:"sms",
+  //         tokenLength: 6
+  //       }, function (err, response) {
+  //       if (err)
+  //         console.log("error: ",err);
+  //       else console.log('res===',response);
+  //   });
       
-    }catch(e){
-      return new  HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+  //   }catch(e){
+  //     return new  HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 
-  async confirmCodeMB(code: string): Promise<any>{
-    try{
-      console.log('phone number === ',this.phone,',code===',code);      
-      const result = await this.messageBirdClient.verify.verify(
-        this.phone,
-        code,
-        function (err, res){
-          if(!err)
-            return res;
-          else return err;
-        }
-      )
-      this.phone='';  
-      return 'Login success';
-  }catch(error){
-    console.log(error);
-    return new HttpException(error, HttpStatus.BAD_REQUEST);
-  }
-  }
+  // async confirmCodeMB(code: string): Promise<any>{
+  //   try{
+  //     console.log('phone number === ',this.phone,',code===',code);      
+  //     const result = await this.messageBirdClient.verify.verify(
+  //       this.phone,
+  //       code,
+  //       function (err, res){
+  //         if(!err)
+  //           return res;
+  //         else return err;
+  //       }
+  //     )
+  //     this.phone='';  
+  //     return 'Login success';
+  // }catch(error){
+  //   console.log(error);
+  //   return new HttpException(error, HttpStatus.BAD_REQUEST);
+  // }
+  // }
 
   async initiatePhoneNumberVerification(phoneNumber: string): Promise<any>{
     try{
@@ -77,7 +123,7 @@ export class SmsService {
           .then(verification => {
             console.log('status: ',verification.status,' id: ',verification.sid);
           })
-          console.log('result===',result);
+          // console.log('result===',result);
       return true;
     }catch (error){
       return new  HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -18,7 +18,9 @@ export class SmsController {
   @Post('')
   @Redirect("/sms/verify")
   async initiatePhoneNumberVerification(@Body() sms: SmsLoginDto){
-    return await this.smsService.initVerifyMB(sms.phoneNumber);
+    // return await this.smsService.initiatePhoneNumberVerification(sms.phoneNumber);
+    const initResult =  await this.smsService.initVerifyVonage(sms.phoneNumber);
+    return initResult;
   }
 
   @Get('/verify')
@@ -28,11 +30,14 @@ export class SmsController {
   @Post('/verify')
   @UseGuards(JwtStrategy)
   async verifiedCode(@Body() req: SmsVerifyDto, @Res() res: Response){
-    const result =  await this.smsService.checkVerifiedCode(req.code);
-    console.log('status===',result.status)
-    if (String(result.status)=='400')
-      res.status(HttpStatus.BAD_REQUEST).send('Login failed');
-    else res.status(HttpStatus.OK).send('Login success');
+    // const result =  await this.smsService.checkVerifiedCode(req.code);
+    // if (String(result.status)=='400')
+    //   res.status(HttpStatus.BAD_REQUEST).send('Login failed');
+    // else res.status(HttpStatus.OK).send('Login success');
+
+    const result = await this.smsService.verifyCodeVonage(req.code);
+    console.log('result status: ', result)
+    return result;
   }
 
 

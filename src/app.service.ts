@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as path from 'path';
-import { LoggerService } from './logger/logger.service';
+import { LoggerService } from './sms/dto/logger/logger.service';
 
 @Injectable()
 export class AppService {

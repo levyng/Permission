@@ -6,8 +6,8 @@ import config from './configuration/config';
 import { AuthModule } from './auth/auth.module';
 import { SmsController } from './sms/sms.controller';
 import { SmsModule } from './sms/sms.module';
-import { LoggerModule } from './logger/logger.module';
-import { LoggerService } from './logger/logger.service';
+import { LoggerModule } from './sms/dto/logger/logger.module';
+import { LoggerService } from './sms/dto/logger/logger.service';
 
 @Module({
   imports: [

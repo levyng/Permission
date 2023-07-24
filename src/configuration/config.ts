@@ -21,5 +21,9 @@ export default () => ({
   message_bird: {
     key: process.env.MESSAGE_BIRD_KEY
   },
+  vonage: {
+    api_key: process.env.VONAGE_API_KEY,
+    api_secret: process.env.VONAGE_API_SECRET
+  },
   port: process.env.PORT || 3000
 })
