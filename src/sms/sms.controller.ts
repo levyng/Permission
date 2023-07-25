@@ -5,6 +5,7 @@ import SmsLoginDto from './dto/sms-login.dto';
 import SmsVerifyDto from './dto/sms-verify.dto';
 import { promises } from 'dns';
 import {Response} from 'express'; 
+import { log } from 'console';
 
 @Controller('sms')
 export class SmsController {
@@ -19,8 +20,7 @@ export class SmsController {
   @Redirect("/sms/verify")
   async initiatePhoneNumberVerification(@Body() sms: SmsLoginDto){
     // return await this.smsService.initiatePhoneNumberVerification(sms.phoneNumber);
-    const initResult =  await this.smsService.initVerifyVonage(sms.phoneNumber);
-    return initResult;
+    return await this.smsService.initVerifyVonage(sms.phoneNumber);    
   }
 
   @Get('/verify')
@@ -36,7 +36,9 @@ export class SmsController {
     // else res.status(HttpStatus.OK).send('Login success');
 
     const result = await this.smsService.verifyCodeVonage(req.code);
-    console.log('result status: ', result)
+    if (String(result.status)=='400'|| String(result.status)=='500')
+      res.status(HttpStatus.BAD_REQUEST).send('Login failed');
+    else res.status(HttpStatus.OK).send('Login success');
     return result;
   }
 

@@ -9,18 +9,19 @@ import initMB, {
   Message,
   MessageBird,
 } from 'messagebird';
-import {
-  Vonage
-} from "@vonage/server-sdk";
+import { Vonage} from "@vonage/server-sdk";
 
 import {VerifyWorkflows} from '@vonage/verify/dist/enums/index';
+import { SmsRequest } from 'src/entities/sms-request.entities';
 @Injectable()
 export class SmsService {
+  private smsRequest: SmsRequest;
   private twilioClient: Twilio;
   private phone: string;
   // private messageBirdClient:  MessageBird;
   private vonageClient: Vonage;
   private vonageRequestId: string;
+  private vonageStatus: string;
 
   constructor(
     private configService: ConfigService
@@ -44,33 +45,38 @@ export class SmsService {
   }
 
   async initVerifyVonage(phoneNumber: string): Promise<any>{
-    this.vonageClient.verify.start({
-      number: phoneNumber,
-      brand: "Vonage",
-      workflowId: VerifyWorkflows.SMS 
-    })
-      .then(resp => {
-        this.vonageRequestId=resp.request_id;
-
-        console.log('reqId:',resp.requestId,', status:',resp.status);
-        if(resp.status==="0")
-          return new HttpException("Success",HttpStatus.OK);
-          else return new HttpException("Failed",HttpStatus.INTERNAL_SERVER_ERROR);
+    try{
+      this.vonageClient.verify.start({
+        number: phoneNumber,
+        brand: "Vonage",
+        workflowId: VerifyWorkflows.SMS
       })
-      .catch(err => {
-        return new  HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-      })
+        .then(resp => {
+          this.vonageRequestId=resp.request_id;
+          console.log('reqId:',resp.requestId,', status:',resp.status);
+        })
+        .catch(err => {
+          throw new BadRequestException('Error==', err);
+        })
+      return true;
+    } catch (err){
+      throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async verifyCodeVonage(code: string): Promise<any>{
+    try{
       this.vonageClient.verify.check(this.vonageRequestId, code)
       .then(resp => {        
         console.log('reqId===',resp.requestId,', status===',resp.status);
-        return resp.status;
       })
       .catch(err =>{
-        return new HttpException(err, HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Error==', err);
       });
+      return true;
+    }catch(err){
+      throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   // async initVerifyMB(phoneNumber): Promise<any>{
